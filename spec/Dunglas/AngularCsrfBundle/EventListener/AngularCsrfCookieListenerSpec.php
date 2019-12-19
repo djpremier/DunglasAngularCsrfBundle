@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
@@ -75,7 +75,7 @@ class AngularCsrfCookieListenerSpec extends ObjectBehavior
     }
 
     public function it_sets_cookie_when_it_does(
-        FilterResponseEvent $event,
+        ResponseEvent $event,
         Response $response,
         ResponseHeaderBag $headers
     ) {
@@ -92,7 +92,7 @@ class AngularCsrfCookieListenerSpec extends ObjectBehavior
         $this->onKernelResponse($event);
     }
 
-    public function it_does_not_set_cookie_on_sub_request(FilterResponseEvent $event)
+    public function it_does_not_set_cookie_on_sub_request(ResponseEvent $event)
     {
         $event->getRequestType()->willReturn(HttpKernelInterface::SUB_REQUEST)->shouldBeCalled();
         $event->getRequest()->shouldNotBeCalled();
@@ -100,7 +100,7 @@ class AngularCsrfCookieListenerSpec extends ObjectBehavior
         $this->onKernelResponse($event);
     }
 
-    public function it_does_not_set_cookie_when_it_does_not(FilterResponseEvent $event)
+    public function it_does_not_set_cookie_when_it_does_not(ResponseEvent $event)
     {
         $event->getRequestType()->willReturn(HttpKernelInterface::MASTER_REQUEST)->shouldBeCalled();
         $event->getRequest()->willReturn($this->unsecureRequest)->shouldBeCalled();
@@ -110,7 +110,7 @@ class AngularCsrfCookieListenerSpec extends ObjectBehavior
     }
 
     public function it_sets_a_cookie_with_no_expiration_when_cookie_expire_is_zero(
-        FilterResponseEvent $event,
+        ResponseEvent $event,
         Response $response,
         ResponseHeaderBag $headers
     ) {
@@ -131,7 +131,7 @@ class AngularCsrfCookieListenerSpec extends ObjectBehavior
 
     public function it_sets_a_cookie_with_expiration_in_the_future_when_expiration_when_required(
         CsrfToken $token,
-        FilterResponseEvent $event,
+        ResponseEvent $event,
         Response $response,
         ResponseHeaderBag $headers
     ) {

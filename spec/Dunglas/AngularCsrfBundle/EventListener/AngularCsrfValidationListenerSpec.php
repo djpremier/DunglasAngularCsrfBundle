@@ -14,7 +14,7 @@ use Dunglas\AngularCsrfBundle\Routing\RouteMatcherInterface;
 use PhpSpec\ObjectBehavior;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -80,7 +80,7 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
         $this->shouldHaveType('Dunglas\AngularCsrfBundle\EventListener\AngularCsrfValidationListener');
     }
 
-    public function it_secures(GetResponseEvent $event)
+    public function it_secures(RequestEvent $event)
     {
         $event->getRequestType()->willReturn(HttpKernelInterface::MASTER_REQUEST);
         $event->getRequest()->willReturn($this->secureValidRequest);
@@ -88,7 +88,7 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
         $this->onKernelRequest($event);
     }
 
-    public function it_throws_an_error_when_the_csrf_token_is_bad(GetResponseEvent $event)
+    public function it_throws_an_error_when_the_csrf_token_is_bad(RequestEvent $event)
     {
         $event->getRequestType()->willReturn(HttpKernelInterface::MASTER_REQUEST);
         $event->getRequest()->willReturn($this->secureInvalidRequest);
@@ -96,7 +96,7 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
         $this->shouldThrow('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException')->duringOnKernelRequest($event);
     }
 
-    public function it_does_not_secure_on_sub_request(GetResponseEvent $event)
+    public function it_does_not_secure_on_sub_request(RequestEvent $event)
     {
         $event->getRequestType()->willReturn(HttpKernelInterface::SUB_REQUEST);
         $event->getRequest()->shouldNotBeCalled();
@@ -104,7 +104,7 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
         $this->onKernelRequest($event);
     }
 
-    public function it_does_not_secure_when_it_does_not(GetResponseEvent $event)
+    public function it_does_not_secure_when_it_does_not(RequestEvent $event)
     {
         $event->getRequestType()->willReturn(HttpKernelInterface::MASTER_REQUEST);
         $event->getRequest()->willReturn($this->unsecureRequest);
@@ -113,7 +113,7 @@ class AngularCsrfValidationListenerSpec extends ObjectBehavior
         $this->onKernelRequest($event);
     }
 
-    public function it_does_not_secure_when_it_is_excluded(GetResponseEvent $event)
+    public function it_does_not_secure_when_it_is_excluded(RequestEvent $event)
     {
         $event->getRequestType()->willReturn(HttpKernelInterface::MASTER_REQUEST);
         $event->getRequest()->willReturn($this->excludedSecureRequest);
